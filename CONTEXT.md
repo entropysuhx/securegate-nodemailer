@@ -1,8 +1,6 @@
 # SecureGate — Build Context & Architecture Reference
 
-> This file documents the implementation plan, phase-by-phase progression,
-> and folder structure rationale. Use it as a reference when writing REFLECTION.md,
-> especially for Q7 (Gall's Law) and Q13 (Conway's Law).
+> This file documents the implementation plan, phase-by-phase progression
 
 ---
 
