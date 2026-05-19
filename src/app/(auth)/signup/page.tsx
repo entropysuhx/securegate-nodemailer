@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { signUpSchema } from "@/lib/validations/auth";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Check, X, Wand2, Copy } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -17,6 +17,29 @@ export default function SignUpPage() {
   const [successMsg, setSuccessMsg] = useState("");
   const [serverError, setServerError] = useState("");
 
+  const handleGeneratePassword = () => {
+    const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    const lower = 'abcdefghijklmnopqrstuvwxyz'
+    const numbers = '0123456789'
+    const special = '!@#$%^&*'
+    const all = upper + lower + numbers + special
+    
+    let pwd = [
+      upper[Math.floor(Math.random() * upper.length)],
+      lower[Math.floor(Math.random() * lower.length)],
+      numbers[Math.floor(Math.random() * numbers.length)],
+      special[Math.floor(Math.random() * special.length)],
+    ]
+    
+    for (let i = 4; i < 16; i++) {
+      pwd.push(all[Math.floor(Math.random() * all.length)])
+    }
+    
+    const generated = pwd.sort(() => Math.random() - 0.5).join('')
+    setPassword(generated)
+    setShowPassword(true)
+  }
+
   const calculateStrength = (pwd: string) => {
     if (pwd.length < 8) return "Weak";
     const hasUpper = /[A-Z]/.test(pwd);
@@ -27,6 +50,10 @@ export default function SignUpPage() {
   };
 
   const strength = calculateStrength(password);
+  const hasLength = password.length >= 8;
+  const hasUpper = /[A-Z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const hasSpecial = /[^A-Za-z0-9]/.test(password);
   const strengthColor =
     password.length === 0
       ? "bg-slate-700"
@@ -112,22 +139,42 @@ export default function SignUpPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1 text-slate-300">Password</label>
+          <div className="flex justify-between items-center mb-1">
+            <label className="block text-sm font-medium text-slate-300">Password</label>
+            <button
+              type="button"
+              onClick={handleGeneratePassword}
+              className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors"
+            >
+              <Wand2 size={12} />
+              Generate
+            </button>
+          </div>
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white pr-10"
+              className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white pr-16"
               placeholder="••••••••"
             />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300 transition-colors"
-            >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => navigator.clipboard.writeText(password)}
+                className="text-slate-400 hover:text-slate-300 transition-colors"
+                title="Copy to clipboard"
+              >
+                <Copy size={18} />
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="text-slate-400 hover:text-slate-300 transition-colors"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
           {errors.password && <p className="text-red-400 text-sm mt-1">{errors.password[0]}</p>}
           <div className="mt-2 flex items-center gap-2">
@@ -135,6 +182,25 @@ export default function SignUpPage() {
               <div className={`h-full transition-all duration-300 ${strengthColor}`} style={{ width: password.length === 0 ? '0%' : strength === 'Weak' ? '33%' : strength === 'Fair' ? '66%' : '100%' }}></div>
             </div>
             <span className="text-xs text-slate-400 w-12 text-right">{password.length > 0 ? strength : ""}</span>
+          </div>
+
+          <div className="mt-3 space-y-2 text-sm">
+            <div className="flex items-center gap-2">
+              {hasLength ? <Check size={16} className="text-green-500" /> : <X size={16} className="text-slate-500" />}
+              <span className={hasLength ? "text-slate-300" : "text-slate-500"}>At least 8 characters</span>
+            </div>
+            <div className="flex items-center gap-2">
+              {hasUpper ? <Check size={16} className="text-green-500" /> : <X size={16} className="text-slate-500" />}
+              <span className={hasUpper ? "text-slate-300" : "text-slate-500"}>At least one uppercase letter (A-Z)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              {hasNumber ? <Check size={16} className="text-green-500" /> : <X size={16} className="text-slate-500" />}
+              <span className={hasNumber ? "text-slate-300" : "text-slate-500"}>At least one number (0-9)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              {hasSpecial ? <Check size={16} className="text-green-500" /> : <X size={16} className="text-slate-500" />}
+              <span className={hasSpecial ? "text-slate-300" : "text-slate-500"}>At least one special character (!@#$%^&*)</span>
+            </div>
           </div>
         </div>
 

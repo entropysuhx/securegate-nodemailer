@@ -3,6 +3,8 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "./prisma";
 import bcrypt from "bcryptjs";
 
+import { loginRatelimit } from "./ratelimit";
+
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
@@ -11,7 +13,27 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" }
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
+        const headers = req?.headers && typeof req.headers.get === 'function'
+          ? req.headers
+          : {
+              get: (name: string) => {
+                if (!req?.headers) return null;
+                const normalized = name.toLowerCase();
+                const key = Object.keys(req.headers).find(k => k.toLowerCase() === normalized);
+                return key ? (req.headers[key] as string) : null;
+              }
+            };
+
+        const ip = headers.get('x-forwarded-for') ??
+                   headers.get('x-real-ip') ??
+                   '127.0.0.1';
+
+        const { success } = await loginRatelimit.limit(ip);
+        if (!success) {
+          throw new Error("TooManyRequests");
+        }
+
         if (!credentials?.email || !credentials?.password) {
           return null;
         }

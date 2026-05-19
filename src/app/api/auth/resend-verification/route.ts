@@ -38,7 +38,13 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ message: "Verification email sent" }, { status: 200 });
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
+    console.error('[RESEND_VERIFICATION] Error:', error);
+    return NextResponse.json(
+      { 
+        error: "An unexpected error occurred. Please try again.",
+        message: "An unexpected error occurred. Please try again."
+      },
+      { status: 500 }
+    );
   }
 }

@@ -11,9 +11,11 @@ const getErrorMessage = (error: string) => {
     case "CredentialsSignin":
       return "Invalid email or password"
     case "WrongPassword":
-      return "Incorrect password"
+      return "Incorrect password"  
     case "EmailNotVerified":
       return "Please verify your email before logging in"
+    case "TooManyRequests":
+      return "Too many login attempts. Please wait 10 minutes and try again."
     default:
       return "Something went wrong. Please try again."
   }
