@@ -1,9 +1,17 @@
 # SecureGate — Reflection & Engineering Analysis
 
+Note: For this version, I switched to Nodemailer so that public users can also test the full email flow, including signup, login, verification, and password reset functionality, without needing a registered or verified email address
+
 **Name:** Sirinada Kanyawimon
 **Cohort:** Design to MVP Bootcamp
+**Live URL:** https://securegate-nodemailer.vercel.app/login
+**GitHub Repo:** https://github.com/entropysuhx/securegate-nodemailer
+
+Resend Version
+
 **Live URL:** https://securegate-mu.vercel.app/login
 **GitHub Repo:** https://github.com/entropysuhx/securegate
+
 
 Note: Resend is now using temporary/testing sender mode for development, so it can only send email to verified/registered emails. Email verification, login, signup, forget password, reset password all working fine when tested with my registered email. It also fail correctly after multiple wrong attempts.
 
@@ -11,6 +19,8 @@ For public email sending, it will need verified custom domain in production.
 I also attached my screen recording below with Google Drive link for proof/testing.
 
 **Screen Record Video:** https://drive.google.com/file/d/1GkTakc1r5GPkZDAE_v33l5fXYCV2gq_O/view?usp=sharing
+
+
 
 
 ## Part 1 — What I Built
