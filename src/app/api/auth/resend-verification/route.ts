@@ -34,7 +34,7 @@ export async function POST(req: Request) {
       }
     });
 
-    await sendVerificationEmail(email, token);
+    await sendVerificationEmail(email, token, req.headers.get("origin"));
 
     return NextResponse.json({ message: "Verification email sent" }, { status: 200 });
   } catch (error) {

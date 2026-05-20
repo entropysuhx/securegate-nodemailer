@@ -52,7 +52,7 @@ export async function POST(req: Request) {
         }
       });
 
-      await sendPasswordResetEmail(email, token);
+      await sendPasswordResetEmail(email, token, req.headers.get("origin"));
     }
 
     return NextResponse.json({ message: successMessage }, { status: 200 });

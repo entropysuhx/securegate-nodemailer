@@ -63,7 +63,7 @@ export async function POST(req: Request) {
       },
     });
 
-    await sendVerificationEmail(email, token);
+    await sendVerificationEmail(email, token, req.headers.get("origin"));
 
     return NextResponse.json(
       { message: "Account created. Please check your email to verify your account." },

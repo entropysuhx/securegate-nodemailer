@@ -1,77 +1,77 @@
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer'
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST,
+  port: Number(process.env.EMAIL_PORT),
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+})
 
-export async function sendVerificationEmail(email: string, token: string) {
-  const verificationUrl = `${process.env.NEXTAUTH_URL}/api/verify-email?token=${token}`;
+function getAppUrl(origin?: string | null) {
+  return (origin || process.env.NEXTAUTH_URL || "http://localhost:3000").replace(/\/$/, "")
+}
 
+export async function sendVerificationEmail(email: string, token: string, origin?: string | null) {
+  const url = `${getAppUrl(origin)}/api/verify-email?token=${encodeURIComponent(token)}`
   try {
-    const { data, error } = await resend.emails.send({
-      from: 'SecureGate <onboarding@resend.dev>',
+    await transporter.sendMail({
+      from: process.env.EMAIL_FROM,
       to: email,
       subject: 'Verify your SecureGate account',
       html: `
-        <div style="font-family: Arial, sans-serif; background-color: #0f1117; color: #ffffff; padding: 40px; border-radius: 8px; max-width: 600px; margin: 0 auto;">
-          <h1 style="color: #ffffff; font-size: 24px; margin-bottom: 20px;">Verify your email address</h1>
-          <p style="color: #94a3b8; font-size: 16px; line-height: 1.5; margin-bottom: 30px;">
-            Click the button below to verify your account. This link expires in 15 minutes.
-          </p>
-          <a href="${verificationUrl}" style="display: inline-block; background-color: #2563eb; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 16px;">
-            Verify Account
+        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px">
+          <h2 style="color:#111">Verify your email</h2>
+          <p>Click the button below to verify your account.
+             This link expires in 15 minutes.</p>
+          <a href="${url}"
+             style="display:inline-block;background:#111;color:#fff;
+                    padding:12px 24px;border-radius:6px;
+                    text-decoration:none;margin:16px 0">
+            Verify my account
           </a>
-          <hr style="border: none; border-top: 1px solid #334155; margin: 40px 0 20px 0;" />
-          <p style="color: #64748b; font-size: 14px;">
+          <p style="color:#888;font-size:13px">
             If you didn't create a SecureGate account, ignore this email.
           </p>
         </div>
-      `
-    });
-
-    if (error) {
-      console.error("Resend error:", error);
-      return { success: false, error };
-    }
-
-    return { success: true };
+      `,
+    })
+    return { success: true }
   } catch (error) {
-    console.error("Failed to send verification email:", error);
-    return { success: false, error };
+    console.error('sendVerificationEmail error:', error)
+    return { success: false, error }
   }
 }
 
-export async function sendPasswordResetEmail(email: string, token: string) {
-  const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password/${token}`;
-
+export async function sendPasswordResetEmail(email: string, token: string, origin?: string | null) {
+  const url = `${getAppUrl(origin)}/reset-password/${encodeURIComponent(token)}`
   try {
-    const { data, error } = await resend.emails.send({
-      from: 'SecureGate <onboarding@resend.dev>',
+    await transporter.sendMail({
+      from: process.env.EMAIL_FROM,
       to: email,
       subject: 'Reset your SecureGate password',
       html: `
-        <div style="font-family: Arial, sans-serif; background-color: #0f1117; color: #ffffff; padding: 40px; border-radius: 8px; max-width: 600px; margin: 0 auto;">
-          <h1 style="color: #ffffff; font-size: 24px; margin-bottom: 20px;">Reset your password</h1>
-          <p style="color: #94a3b8; font-size: 16px; line-height: 1.5; margin-bottom: 30px;">
-            Click the button below to reset your password. This link expires in 1 hour.
-          </p>
-          <a href="${resetUrl}" style="display: inline-block; background-color: #2563eb; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 16px;">
-            Reset Password
+        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px">
+          <h2 style="color:#111">Reset your password</h2>
+          <p>Click the button below to set a new password.
+             This link expires in 1 hour.</p>
+          <a href="${url}"
+             style="display:inline-block;background:#111;color:#fff;
+                    padding:12px 24px;border-radius:6px;
+                    text-decoration:none;margin:16px 0">
+            Reset my password
           </a>
-          <hr style="border: none; border-top: 1px solid #334155; margin: 40px 0 20px 0;" />
-          <p style="color: #64748b; font-size: 14px;">
-            If you didn't request a password reset, you can safely ignore this email.
+          <p style="color:#888;font-size:13px">
+            If you didn't request a password reset, ignore this email.
           </p>
         </div>
-      `
-    });
-
-    if (error) {
-      console.error("Resend error:", error);
-      return { success: false, error };
-    }
-
-    return { success: true };
+      `,
+    })
+    return { success: true }
   } catch (error) {
-    console.error("Failed to send reset email:", error);
-    return { success: false, error };
+    console.error('sendPasswordResetEmail error:', error)
+    return { success: false, error }
   }
 }
