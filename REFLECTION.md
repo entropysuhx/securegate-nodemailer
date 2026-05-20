@@ -5,6 +5,14 @@
 **Live URL:** https://securegate-mu.vercel.app/login
 **GitHub Repo:** https://github.com/entropysuhx/securegate
 
+Note: Resend is now using temporary/testing sender mode for development, so it can only send email to verified/registered emails. Email verification, login, signup, forget password, reset password all working fine when tested with my registered email. It also fail correctly after multiple wrong attempts.
+
+For public email sending, it will need verified custom domain in production.
+I also attached my screen recording below with Google Drive link for proof/testing.
+
+**Screen Record Video:** https://drive.google.com/file/d/1GkTakc1r5GPkZDAE_v33l5fXYCV2gq_O/view?usp=sharing
+
+
 ## Part 1 — What I Built
 
 I built SecureGate, an authentication and security web app where users can create account and login with username and password. Before login, users need to verify email first. The app also have forgot password and reset password feature using email link. It also blocks login after 5 failed attempts for 10 minutes.
